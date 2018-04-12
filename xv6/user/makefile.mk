@@ -3,7 +3,6 @@
 USER_PROGS := \
 	cat\
 	echo\
-	forktest\
 	grep\
 	init\
 	kill\
@@ -84,7 +83,9 @@ user/bin/%: user/%.o $(USER_LIBS) | user/bin
 
 # forktest has less library code linked in - needs to be small
 # in order to be able to max out the proc table.
-user/bin/forktest: user/forktest.o user/ulib.o user/usys.o | user/bin
+# p4b: add user/umalloc.o as a dependency so that malloc() does not give an error
+# in thread_create and thread_join
+user/bin/forktest: user/umalloc.o user/forktest.o user/ulib.o user/usys.o | user/bin
 	$(LD) $(LDFLAGS) $(USER_LDFLAGS) --output=$@ $^
 
 # default recipe for object files
@@ -102,4 +103,3 @@ user/%.d: user/%.c
 user/%.d: user/%.S
 	$(CC) $(CPPFLAGS) $(USER_CPPFLAGS) $(ASFLAGS) $(USER_ASFLAGS) \
 		-M -MG $< -MF $@ -MT $@ -MT $(<:.S=.o)
-
