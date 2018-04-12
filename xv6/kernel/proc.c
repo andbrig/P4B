@@ -175,26 +175,45 @@ clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
   np->parent = proc;
   *np->tf = *proc->tf;
 
-  // thread gets its own stack
+  // zero out eax (eax holds return value of 0 in child like in fork())
+  np->tf->eax = 0;
+  // new process uses stack passed in syscall
+  // note that this is the BOTTOM of the stack; we need to add PGSIZE to get
+  // the top of the stack
   np->stack = stack;
 
-  /* CLONE STUFF */
-  // STEP 2: determine location to push return address
-  // STEP 3: push return address to stack
-  // STEP 4: determine location to push function arguments
-  // SETP 5: push function arguments onto stack in reverse order (arg2, arg1)
-  // STEP 6: set stack pointer ESP to equal base pointer (stack)
-  // STEP 7:
+  /*
+   * Stack grows downwards; from high address to low address.
+   * It will be as follows for np->stack:
+   *
+   *  stack + PGSIZE:   argument 2            [--  old frame/base pointer
+   *                    argument 1            [--
+   *                    fake return address   [--
+   *                    [empty slot]          [-------- new frame/base pointer
+   *                                                (also the new stack pointer)
+   *
+   *
+   *
+   */
 
-  *((uint*)(stack + PGSIZE - (sizeof(void*) * 3))) = 0xffffffff;
-  *((uint*)(stack + PGSIZE - (sizeof(void*) * 2))) = (uint) arg2;
-  *((uint*)(stack + PGSIZE - sizeof(void*))) = (uint) arg1;
+  // setup function arguments on stack
+  void* stackBase = stack + PGSIZE;
+  stackBase -= sizeof(void*);
+  *((uint*) stackBase) = (uint) arg2;
+  stackBase -= sizeof(void*);
+  *((uint*) stackBase) = (uint) arg1;
 
-  np->tf->esp = (int) stack;
-  memmove( (void*) np->tf->esp, stack, PGSIZE);
-  np->tf->esp = np->tf->esp + PGSIZE - (sizeof(void*) * 3);
-  np->tf->eip = (int) fcn;
-  np->tf->ebp = np->tf->esp;
+  // setup fake reutrn address for function call on stack
+  stackBase -= sizeof(void*);
+  *((uint*) stackBase) = 0xffffffff;
+
+  // set new base pointer and stack pointer to be same value
+  stackBase -= sizeof(void*);
+  np->tf->ebp = stackBase;
+  np->tf->esp = stackBase;
+
+  // set instruction pointer to start of function call
+  np->tf->eip = (uint) fcn;
 
   // same as fork
   for(i = 0; i < NOFILE; i++)
