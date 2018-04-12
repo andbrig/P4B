@@ -116,6 +116,17 @@ growproc(int n)
     if((sz = deallocuvm(proc->pgdir, sz, sz + n)) == 0)
       return -1;
   }
+
+  // not only do we need to update the proc's size, but also the
+  // child threads' sizes, as they share the same address space
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    if(p->parent == proc && p->pgdir == proc->pgdir) {  // check if a child thread
+      p->sz = sz;
+    }
+  }
+  release(&ptable.lock);
+
   proc->sz = sz;
   switchuvm(proc);
   return 0;
@@ -175,26 +186,45 @@ clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
   np->parent = proc;
   *np->tf = *proc->tf;
 
-  // thread gets its own stack
-  np->stack = stack;
+  // zero out eax (eax holds return value of 0 in child like in fork())
+  np->tf->eax = 0;
+  // new process uses stack passed in syscall
+  // note that this is the BOTTOM of the stack; we need to add PGSIZE to get
+  // the top of the stack
+  np->ustack = stack;
 
-  /* CLONE STUFF */
-  // STEP 2: determine location to push return address
-  // STEP 3: push return address to stack
-  // STEP 4: determine location to push function arguments
-  // SETP 5: push function arguments onto stack in reverse order (arg2, arg1)
-  // STEP 6: set stack pointer ESP to equal base pointer (stack)
-  // STEP 7:
+  /*
+   * Stack grows downwards; from high address to low address.
+   * It will be as follows for np->stack:
+   *
+   *  stack + PGSIZE:   argument 2            [--  old frame/base pointer
+   *                    argument 1            [--
+   *                    fake return address   [--
+   *                    [empty slot]          [-------- new frame/base pointer
+   *                                                (also the new stack pointer)
+   *
+   *
+   *
+   */
 
-  *((uint*)(stack + PGSIZE - (sizeof(void*) * 3))) = 0xffffffff;
-  *((uint*)(stack + PGSIZE - (sizeof(void*) * 2))) = (uint) arg2;
-  *((uint*)(stack + PGSIZE - sizeof(void*))) = (uint) arg1;
+  // setup function arguments on stack
+  void* stackBase = stack + PGSIZE;
+  stackBase -= sizeof(void*);
+  *((uint*) stackBase) = (uint) arg2;
+  stackBase -= sizeof(void*);
+  *((uint*) stackBase) = (uint) arg1;
 
-  np->tf->esp = (int) stack;
-  memmove( (void*) np->tf->esp, stack, PGSIZE);
-  np->tf->esp = np->tf->esp + PGSIZE - (sizeof(void*) * 3);
-  np->tf->eip = (int) fcn;
-  np->tf->ebp = np->tf->esp;
+  // setup fake reutrn address for function call on stack
+  stackBase -= sizeof(void*);
+  *((uint*) stackBase) = 0xffffffff;
+
+  // set new base pointer and stack pointer to be same value
+  stackBase -= sizeof(void*);
+  np->tf->ebp = stackBase;
+  np->tf->esp = stackBase;
+
+  // set instruction pointer to start of function call
+  np->tf->eip = (uint) fcn;
 
   // same as fork
   for(i = 0; i < NOFILE; i++)
@@ -202,58 +232,14 @@ clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
       np->ofile[i] = filedup(proc->ofile[i]);
   np->cwd = idup(proc->cwd);
 
+  // in main thread, return child proc's pid
   pid = np->pid;
   np->state = RUNNABLE;
   safestrcpy(np->name, proc->name, sizeof(proc->name));
   return pid;
 }
 
-/*
- * WE ARE NOT DONE WITH THIS...
- */
-int
-join(void** stack) {
 
-  struct proc *p;
-  int havekids, pid;
-
-  acquire(&ptable.lock);
-  for(;;){
-    // Scan through table looking for zombie children.
-    havekids = 0;
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      // check if child is thread
-      if(p->parent != proc || proc->pgdir != p->pgdir || proc->pid == p->pid)
-        continue;
-      havekids = 1;
-      if(p->state == ZOMBIE){
-        // Found one.
-        pid = p->pid;
-        kfree(p->kstack);
-        p->kstack = 0;
-        freevm(p->pgdir);
-        p->state = UNUSED;
-        p->pid = 0;
-        p->parent = 0;
-        p->name[0] = 0;
-        p->killed = 0;
-        release(&ptable.lock);
-        return pid;
-      }
-    }
-
-    // No point waiting if we don't have any children.
-    if(!havekids || proc->killed){
-      release(&ptable.lock);
-      return -1;
-    }
-
-    // Wait for children to exit.  (See wakeup1 call in proc_exit.)
-    sleep(proc, &ptable.lock);  //DOC: wait-sleep
-  }
-
-  return 0;
-}
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
 // until its parent calls wait() to find out it exited.
@@ -316,13 +302,20 @@ wait(void)
   struct proc *p;
   int havekids, pid;
 
+  int child_threads; // threads associated with address space
+
   acquire(&ptable.lock);
   for(;;){
     // Scan through table looking for zombie children.
     havekids = 0;
+    child_threads = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->parent != proc || proc->pgdir == p->pgdir)
+      if(p->parent != proc)
         continue;
+      if(proc->pgdir == p->pgdir) { // skip threads, but take note that one exists
+        ++child_threads;
+        continue;
+      }
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
@@ -342,6 +335,12 @@ wait(void)
 
     // No point waiting if we don't have any children.
     if(!havekids || proc->killed){
+      // check if there are no threads associated with this user address space
+      // if there are some associated; don't do anything
+      // if there aren't; free this address space
+      if(child_threads > 0) {
+        // free address space; whose address space? IDK
+      }
       release(&ptable.lock);
       return -1;
     }
@@ -349,6 +348,53 @@ wait(void)
     // Wait for children to exit.  (See wakeup1 call in proc_exit.)
     sleep(proc, &ptable.lock);  //DOC: wait-sleep
   }
+}
+
+int
+join(void** stack) {
+
+  struct proc *p;
+  int havekids, pid;
+
+  acquire(&ptable.lock);
+  for(;;){
+    // Scan through table looking for zombie children.
+    havekids = 0;
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      // check if child is thread
+      if(p->parent != proc || proc->pgdir != p->pgdir)  // skip full procs
+        continue;
+      havekids = 1;
+      if(p->state == ZOMBIE){
+        // Found one.
+        pid = p->pid;
+        kfree(p->kstack);
+        p->kstack = 0;
+        //freevm(p->pgdir); // dont free vm; threads share the same pgdir!
+        // however, we must copy the location of the child's user stack so that
+        // it can be free'd outside of join
+        *stack = p->ustack;
+        p->state = UNUSED;
+        p->pid = 0;
+        p->parent = 0;
+        p->name[0] = 0;
+        p->killed = 0;
+        release(&ptable.lock);
+        return pid;
+      }
+    }
+
+    // No point waiting if we don't have any children.
+    if(!havekids || proc->killed){
+      release(&ptable.lock);
+      return -1;
+    }
+
+    // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+    sleep(proc, &ptable.lock);  //DOC: wait-sleep
+  }
+
+  return 0;
 }
 
 // Per-CPU process scheduler.

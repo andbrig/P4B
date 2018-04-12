@@ -12,34 +12,35 @@ sys_clone(void) {
   void *arg2;
   void *stack;
   void *function;
-  if(argptr(0, (void*)&function, sizeof(void*)) == -1) {
+
+  // retrieve from stack
+  if(argptr(0, (void*)&function, sizeof(void*)) == -1 ||
+    argptr(0, (void*)&arg1, sizeof(void*)) == -1 ||
+    argptr(0, (void*)&arg2, sizeof(void*)) == -1 ||
+    argptr(0, (void*)&stack, sizeof(void*)) == -1)
     return -1;
-  }
-  if(argptr(0, (void*)&arg1, sizeof(void*)) == -1) {
-    return -1;
-  }
-  if(argptr(0, (void*)&arg2, sizeof(void*)) == -1) {
-    return -1;
-  }
-  if(argptr(0, (void*)&stack, sizeof(void*)) == -1) {
-    return -1;
-  }
+
+    // check if stack is page aligned
   if((uint) stack % PGSIZE != 0) {
     return -1;
   }
 
-  // TODO: Must check if stack = page size; IDK IF THIS WORKS
+  // check stack size == PGSIZE
   if((uint)proc->sz - (uint)stack != PGSIZE) {
     return -1;
   }
+
   return clone(function, arg1, arg2, stack);
 }
 int
 sys_join(void) {
   void** stack;
+
+  // retrieve from stack
   if(argptr(0, (void*)&stack, sizeof(void*)) == -1) {
     return -1;
   }
+  
   return join(stack);
 }
 int

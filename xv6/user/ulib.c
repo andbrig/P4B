@@ -96,10 +96,26 @@ void*
 memmove(void *vdst, void *vsrc, int n)
 {
   char *dst, *src;
-  
+
   dst = vdst;
   src = vsrc;
   while(n-- > 0)
     *dst++ = *src++;
   return vdst;
+}
+
+int
+thread_create(void (*start_routine)(void*, void*), void* arg1, void* arg2) {
+  void* ustack = malloc(PGSIZE);
+  // we now have to check if this is page aligned
+  return clone(start_routine, arg1, arg2, ustack);
+}
+
+int
+thread_join() {
+  void* ustack;
+  int join_ret = join(&ustack);
+  if(join_ret != -1)
+    free(ustack);
+  return join_ret;
 }
