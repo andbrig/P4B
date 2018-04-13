@@ -68,6 +68,8 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
+  p->ref_count = 1;
+
   return p;
 }
 
@@ -198,6 +200,10 @@ clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
   // new process uses stack passed in syscall
   // note that this is the BOTTOM of the stack; we need to add PGSIZE to get
   // the top of the stack
+  np->mem_start = (void*)*((uint*) stack);
+
+//  cprintf("Clone mem_start: %p\n", np->mem_start);
+  *((uint*) stack) = 0;
   np->ustack = stack;
 
   /*
@@ -247,6 +253,9 @@ clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
   np->state = RUNNABLE;
   safestrcpy(np->name, proc->name, sizeof(proc->name));
 //  cprintf("NP->PID:");
+  proc->ref_count += 1;
+  np->ref_count = proc->ref_count;
+//  cprintf("Threads created: %d\n", proc->ref_count);
   return np->pid;
 }
 
@@ -313,22 +322,15 @@ wait(void)
   struct proc *p;
   int havekids, pid;
 
-  int child_threads; // threads associated with address space
-
   acquire(&ptable.lock);
   for(;;){
     // Scan through table looking for zombie children.
     havekids = 0;
-    child_threads = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->parent != proc)
+      if(p->parent != proc || proc->pgdir == p->pgdir)  // skip through threads
         continue;
-      if(proc->pgdir == p->pgdir) { // skip threads, but take note that one exists
-        ++child_threads;
-        continue;
-      }
       havekids = 1;
-      if(p->state == ZOMBIE) {
+      if(p->state == ZOMBIE && p->ref_count == 1) { // check if no threads associated
         // Found one.
         pid = p->pid;
         kfree(p->kstack);
@@ -349,9 +351,6 @@ wait(void)
       // check if there are no threads associated with this user address space
       // if there are some associated; don't do anything
       // if there aren't; free this address space
-      if(child_threads > 0) {
-        // free address space; whose address space? IDK
-      }
       release(&ptable.lock);
       return -1;
     }
@@ -379,17 +378,25 @@ join(void** stack) {
       if(p->state == ZOMBIE){
         // Found one.
         pid = p->pid;
-        kfree(p->kstack);
-        p->kstack = 0;
-        //freevm(p->pgdir); // dont free vm; threads share the same pgdir!
+
+
+        //if(p->ref_count == 1)
+        //  freevm(p->pgdir); // dont free vm; threads share the same pgdir!
         // however, we must copy the location of the child's user stack so that
         // it can be free'd outside of join
         *stack = p->ustack;
+        *((uint*)(*stack)) = (uint) p->mem_start;
+      //  cprintf("Join mem_start: %d\n", *((uint*)*stack));
+        kfree(p->kstack);
+        p->kstack = 0;
         p->state = UNUSED;
         p->pid = 0;
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+        p->ref_count -= 1;
+        proc->ref_count -= 1;
+          //cprintf("Threads remaining: %d\n", proc->ref_count);
         release(&ptable.lock);
         return pid;
       }

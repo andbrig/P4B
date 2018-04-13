@@ -3,6 +3,7 @@
 USER_PROGS := \
 	clone_arguments\
 	threads_basic\
+	threads_many\
 	cat\
 	echo\
 	grep\

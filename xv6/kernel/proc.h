@@ -75,6 +75,9 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   void* ustack;                 // p4 kernel threads: Bottom of user stack
+  int ref_count;             // p4 kernel threads: checks number of references
+                              // to same address space
+  void* mem_start;               // p4 kernel threads: malloc'd ptr -- free
 };
 
 // Process memory is laid out contiguously, low addresses first:

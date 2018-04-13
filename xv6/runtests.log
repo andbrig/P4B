@@ -32,25 +32,26 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-rm
-init
 mkdir
-kill
-stressfs
 threads_basic
-zombie
-grep
-sh
 ln
-ls
-cat
-usertests
 echo
-wc
-README
 tester
-balloc: first 498 blocks have been allocated
+sh
+wc
+ls
+init
+zombie
+README
+usertests
+grep
+threads_many
+cat
+clone_arguments
+kill
+rm
+stressfs
+balloc: first 533 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -62,6 +63,7 @@ WARNING: Image format was not specified for 'fs.img' and probing guessed raw.
 WARNING: Image format was not specified for 'xv6.img' and probing guessed raw.
          Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
          Specify the 'raw' format explicitly to remove the restrictions.
+main-loop: WARNING: I/O thread spun for 1000 iterations
 xv6...
 lapicinit: 1 0xfee00000
 cpu1: starting
@@ -70,6 +72,7 @@ init: starting sh
 $ tester
 tester
 PASSED TEST!
+
 
 test clone_parent_sleep PASSED (10 of 10)
  (test for clone() and join() where the thread terminates before join() is called)
@@ -92,25 +95,26 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-rm
-init
 mkdir
-kill
-stressfs
 threads_basic
-zombie
-grep
-sh
 ln
-ls
-cat
-usertests
 echo
-wc
-README
 tester
-balloc: first 498 blocks have been allocated
+sh
+wc
+ls
+init
+zombie
+README
+usertests
+grep
+threads_many
+cat
+clone_arguments
+kill
+rm
+stressfs
+balloc: first 534 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -153,25 +157,26 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-rm
-init
 mkdir
-kill
-stressfs
 threads_basic
-zombie
-grep
-sh
 ln
-ls
-cat
-usertests
 echo
-wc
-README
 tester
-balloc: first 500 blocks have been allocated
+sh
+wc
+ls
+init
+zombie
+README
+usertests
+grep
+threads_many
+cat
+clone_arguments
+kill
+rm
+stressfs
+balloc: first 535 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -214,25 +219,26 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-rm
-init
 mkdir
-kill
-stressfs
 threads_basic
-zombie
-grep
-sh
 ln
-ls
-cat
-usertests
 echo
-wc
-README
 tester
-balloc: first 501 blocks have been allocated
+sh
+wc
+ls
+init
+zombie
+README
+usertests
+grep
+threads_many
+cat
+clone_arguments
+kill
+rm
+stressfs
+balloc: first 536 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -253,9 +259,10 @@ $ tester
 tester
 bad args
 bad args
-page alignment
-size
+page alignment or size error
+page alignment or size error
 PASSED TEST!
+
 
 test clone_bad PASSED (10 of 10)
  (error tests for clone() and join())
@@ -278,25 +285,26 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-rm
-init
 mkdir
-kill
-stressfs
 threads_basic
-zombie
-grep
-sh
 ln
-ls
-cat
-usertests
 echo
-wc
-README
 tester
-balloc: first 499 blocks have been allocated
+sh
+wc
+ls
+init
+zombie
+README
+usertests
+grep
+threads_many
+cat
+clone_arguments
+kill
+rm
+stressfs
+balloc: first 534 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -342,25 +350,26 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-rm
-init
 mkdir
-kill
-stressfs
 threads_basic
-zombie
-grep
-sh
 ln
-ls
-cat
-usertests
 echo
-wc
-README
 tester
-balloc: first 500 blocks have been allocated
+sh
+wc
+ls
+init
+zombie
+README
+usertests
+grep
+threads_many
+cat
+clone_arguments
+kill
+rm
+stressfs
+balloc: first 535 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -403,25 +412,26 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-rm
-init
 mkdir
-kill
-stressfs
 threads_basic
-zombie
-grep
-sh
 ln
-ls
-cat
-usertests
 echo
-wc
-README
 tester
-balloc: first 504 blocks have been allocated
+sh
+wc
+ls
+init
+zombie
+README
+usertests
+grep
+threads_many
+cat
+clone_arguments
+kill
+rm
+stressfs
+balloc: first 539 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -451,12 +461,12 @@ Created 61 child threads
 Joining all 61 child threads...
 All 61 child threads joined
 Creating and joining 10000 child threads...
-pid 3 tester: trap 14 err 6 on cpu 0 eip 0x1154 addr 0x8878775c--kill proc
-$ 
+Forking and joining 100 child processes...
+PASSED TEST!
 
-test threads_many FAILED (0 of 10)
+
+test threads_many PASSED (10 of 10)
  (create and join many threads)
- tester failed
 
 starting threads_zombies
 
@@ -476,25 +486,26 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-rm
-init
 mkdir
-kill
-stressfs
 threads_basic
-zombie
-grep
-sh
 ln
-ls
-cat
-usertests
 echo
-wc
-README
 tester
-balloc: first 499 blocks have been allocated
+sh
+wc
+ls
+init
+zombie
+README
+usertests
+grep
+threads_many
+cat
+clone_arguments
+kill
+rm
+stressfs
+balloc: first 534 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -514,16 +525,10 @@ init: starting sh
 $ tester
 tester
 Created 50 child threads, creator thread exiting...
-xv6...
-lapicinit: 1 0xfee00000
-cpu1: starting
-cpu0: starting
-init: starting sh
-$ 
+PASSED TEST!
 
-test threads_zombies FAILED (0 of 10)
+test threads_zombies PASSED (10 of 10)
  (create many threads, and make them all zombies)
- tester failed
 
 starting threads_sbrk
 
@@ -543,25 +548,26 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-rm
-init
 mkdir
-kill
-stressfs
 threads_basic
-zombie
-grep
-sh
 ln
-ls
-cat
-usertests
 echo
-wc
-README
 tester
-balloc: first 506 blocks have been allocated
+sh
+wc
+ls
+init
+zombie
+README
+usertests
+grep
+threads_many
+cat
+clone_arguments
+kill
+rm
+stressfs
+balloc: first 541 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -606,25 +612,26 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-rm
-init
 mkdir
-kill
-stressfs
 threads_basic
-zombie
-grep
-sh
 ln
-ls
-cat
-usertests
 echo
-wc
-README
 tester
-balloc: first 499 blocks have been allocated
+sh
+wc
+ls
+init
+zombie
+README
+usertests
+grep
+threads_many
+cat
+clone_arguments
+kill
+rm
+stressfs
+balloc: first 535 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -673,13 +680,11 @@ test clone_return PASSED (10 of 10)
 test threads_basic PASSED (10 of 10)
  (basic tests for thread_create() and thread_join())
 
-test threads_many FAILED (0 of 10)
+test threads_many PASSED (10 of 10)
  (create and join many threads)
- tester failed
 
-test threads_zombies FAILED (0 of 10)
+test threads_zombies PASSED (10 of 10)
  (create many threads, and make them all zombies)
- tester failed
 
 test threads_sbrk FAILED (0 of 10)
  (test to make sure threads handle sbrk() correctly)
@@ -689,6 +694,6 @@ test lock_basic FAILED (0 of 10)
  (basic test for lock correctness)
  Timelimit (10.0s) exceeded
 
-Passed 7 of 11 tests.
-Overall 7 of 11
-Points 60 of 100
+Passed 9 of 11 tests.
+Overall 9 of 11
+Points 80 of 100
