@@ -25,6 +25,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int clone(void(*fcn)(void*, void*), void*, void*, void*);
+int join(void**);
 
 // user library functions (ulib.c)
 int stat(char*, struct stat*);
@@ -40,5 +42,28 @@ void* malloc(uint);
 void free(void*);
 int atoi(const char*);
 
-#endif // _USER_H_
+// thread functions
+int thread_create(void (*start_routine)(void*, void*), void*, void*);
+int thread_join();
 
+// lock
+typedef struct __lock_t {
+  int ticket;
+  int turn;
+} lock_t;
+
+static inline int fetch_and_add(int* variable, int value)
+  {
+      __asm__ volatile("lock; xaddl %0, %1"
+        : "+r" (value), "+m" (*variable) // input+output
+        : // No input-only
+        : "memory"
+      );
+      return value;
+  }
+
+void lock_init(lock_t *);
+void lock_acquire(lock_t *);
+void lock_release(lock_t *);
+
+#endif // _USER_H_

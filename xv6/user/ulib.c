@@ -4,6 +4,8 @@
 #include "user.h"
 #include "x86.h"
 
+#define PGSZ 0x1000
+
 char*
 strcpy(char *s, char *t)
 {
@@ -106,8 +108,16 @@ memmove(void *vdst, void *vsrc, int n)
 
 int
 thread_create(void (*start_routine)(void*, void*), void* arg1, void* arg2) {
-  void* ustack = malloc(PGSIZE);
-  // we now have to check if this is page aligned
+//printf(1, "before malloc\n");
+  void* mem_start = malloc(PGSZ);
+  //printf(1, "after malloc\n");
+  void* ustack = mem_start;
+  uint start_mod = (uint) mem_start % PGSZ;
+  // check if page aligned
+  if(start_mod != 0) {
+    ustack += (PGSZ - start_mod);
+  }
+  //*((uint*)(ustack + PGSZ - sizeof(void*))) = (uint) mem_start; // put malloc'd ptr as first thing on stack
   return clone(start_routine, arg1, arg2, ustack);
 }
 
@@ -115,7 +125,27 @@ int
 thread_join() {
   void* ustack;
   int join_ret = join(&ustack);
-  if(join_ret != -1)
+//  if(join_ret != -1) {
+  //  void* free_ptr = (void*)*((uint*)(ustack + PGSZ - sizeof(void*)));
     free(ustack);
+//  }
   return join_ret;
+}
+
+void
+lock_init(lock_t* lock) {
+  lock->ticket = 0;
+  lock->turn = 0;
+}
+
+void
+lock_acquire(lock_t* lock) {
+  int myturn = fetch_and_add(&lock->ticket, 1);
+  while(lock->turn != myturn)
+    ;
+}
+
+void
+lock_release(lock_t* lock) {
+  lock->turn = lock->turn + 1;
 }
