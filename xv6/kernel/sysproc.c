@@ -20,24 +20,13 @@ sys_clone(void) {
     argptr(3, (void*)&stack, sizeof(void*)) == -1) {
       cprintf("bad args\n");
       return -1;
-    }
-
-
-    // check if stack is page aligned
-
-  if((uint) stack % PGSIZE != 0) {
-    cprintf("page alignment\n");
+  }
+  
+  // check page alignment and stack size
+  if((uint) stack % PGSIZE != 0 || proc->sz - (uint)stack < PGSIZE) {
+    cprintf("page alignment or size error\n");
     return -1;
   }
-
-
-  // check stack size == PGSIZE
-
-  if(proc->sz - (uint)stack < PGSIZE) {
-    cprintf("size\n");
-    return -1;
-  }
-
 
   return clone(function, arg1, arg2, stack);
 }

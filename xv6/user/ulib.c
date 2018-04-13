@@ -117,18 +117,24 @@ thread_create(void (*start_routine)(void*, void*), void* arg1, void* arg2) {
   if(start_mod != 0) {
     ustack += (PGSZ - start_mod);
   }
+  *((uint*)ustack) = (uint) mem_start;
+  //printf(1, "mem_start addr (in create): %p\n", mem_start);
+  //printf(1, "mem_start: %p, ustack: %p\n", mem_start, ustack);
   //*((uint*)(ustack + PGSZ - sizeof(void*))) = (uint) mem_start; // put malloc'd ptr as first thing on stack
   return clone(start_routine, arg1, arg2, ustack);
 }
 
 int
 thread_join() {
-  void* ustack;
+  void* ustack = NULL;
   int join_ret = join(&ustack);
 //  if(join_ret != -1) {
   //  void* free_ptr = (void*)*((uint*)(ustack + PGSZ - sizeof(void*)));
-    free(ustack);
+  //printf(1, "mem_start addr (in join): %p\n", ustack);
+  uint* free_ptr = (uint*)ustack;
+    free((void*)*free_ptr);
 //  }
+  //free(ustack);
   return join_ret;
 }
 
