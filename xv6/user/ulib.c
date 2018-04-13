@@ -4,7 +4,7 @@
 #include "user.h"
 #include "x86.h"
 
-#define PGSZ 0x1000
+#define PGSZ (0x1000)
 
 char*
 strcpy(char *s, char *t)
@@ -110,13 +110,18 @@ int
 thread_create(void (*start_routine)(void*, void*), void* arg1, void* arg2) {
 //printf(1, "before malloc\n");
   void* mem_start = malloc(PGSZ);
+  if(mem_start == NULL)
+    return -1;
   //printf(1, "after malloc\n");
   void* ustack = mem_start;
   uint start_mod = (uint) mem_start % PGSZ;
   // check if page aligned
   if(start_mod != 0) {
-    ustack += (PGSZ - start_mod);
+  //  printf(1, "page alignment issue incoming...\n");
+    ustack = (void*)ustack + (uint)(PGSZ - start_mod);
+    //ustack += (start_mod);
   }
+//  printf(1, "mem_start: %p, ustack: %p\n\n", mem_start, ustack);
   *((uint*)ustack) = (uint) mem_start;
   //printf(1, "mem_start addr (in create): %p\n", mem_start);
   //printf(1, "mem_start: %p, ustack: %p\n", mem_start, ustack);

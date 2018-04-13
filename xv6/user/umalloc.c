@@ -81,6 +81,7 @@ malloc(uint nbytes)
         p->s.size = nunits;
       }
       freep = prevp;
+      //printf(1, "Alloc'd actually %d bytes\n", nbytes);
       return (void*)(p + 1);
     }
     if(p == freep)

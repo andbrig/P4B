@@ -78,6 +78,9 @@ struct proc {
   int ref_count;             // p4 kernel threads: checks number of references
                               // to same address space
   void* mem_start;               // p4 kernel threads: malloc'd ptr -- free
+	// possibly add a ticket lock for each process; this way, when threads access
+	// members of the parent proc, there is no data race
+	// lock_t t_lock;
 };
 
 // Process memory is laid out contiguously, low addresses first:

@@ -99,15 +99,12 @@ multiple_thread_create(void)
   int pid1, pid2, status, i;
 
   printf(1, "Creating and joining 10000 child threads...\n");
-  // change back to 10000
   for (i = 0; i < 10000; ++i) {
     ++global;
-  //  printf(1, "Iteration i = %d\n", i);
     pid1 = thread_create(&func2, NULL, NULL);
     check(pid1 > ppid, "thread_create() failed");
     pid2 = thread_join();
     status = kill(pid1);
-    //status = wait();
     check(status == -1, "Child was still alive after thread_join()");
     check(pid1 == pid2, "thread_join() returned the wrong pid");
     check(global == 0, "global is incorrect");
@@ -152,11 +149,17 @@ main(int argc, char *argv[])
   check(ppid > 2, "getpid() failed");
   lastpid = ppid;
 
+  check(
+    (uint)&argc < 3*PGSIZE,
+    "Program uses too much memory, stack of main thread should be in first three pages"
+  );
+
   // With the given allocator, after this line, malloc() will (probably) not be
   // page aligned
   unused = malloc(rdtsc() % (PGSIZE-1) + 1);
 
   // Try to fill up process table
+  //printf(1, "now we start\n");
   count1 = fill_ptable();
   global = 0;
   count2 = fill_ptable();

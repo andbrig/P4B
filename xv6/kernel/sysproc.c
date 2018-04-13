@@ -21,7 +21,7 @@ sys_clone(void) {
       cprintf("bad args\n");
       return -1;
   }
-  
+
   // check page alignment and stack size
   if((uint) stack % PGSIZE != 0 || proc->sz - (uint)stack < PGSIZE) {
     cprintf("page alignment or size error\n");
@@ -84,9 +84,11 @@ sys_sbrk(void)
 
   if(argint(0, &n) < 0)
     return -1;
+  acquire(&sbrk_lock);
   addr = proc->sz;
   if(growproc(n) < 0)
     return -1;
+  release(&sbrk_lock);
   return addr;
 }
 
