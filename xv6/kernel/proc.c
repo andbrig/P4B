@@ -121,7 +121,7 @@ growproc(int n)
 
   // not only do we need to update the proc's size, but also the
   // child threads' sizes, as they share the same address space
-  /*
+
   acquire(&ptable.lock);
   struct proc* p;
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
@@ -130,7 +130,7 @@ growproc(int n)
     }
   }
   release(&ptable.lock);
-*/
+
   proc->sz = sz;
   switchuvm(proc);
   return 0;
