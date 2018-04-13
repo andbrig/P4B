@@ -1,6 +1,8 @@
 
 # user programs
 USER_PROGS := \
+	clone_arguments\
+	threads_basic\
 	cat\
 	echo\
 	grep\

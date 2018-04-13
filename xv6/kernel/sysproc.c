@@ -15,20 +15,29 @@ sys_clone(void) {
 
   // retrieve from stack
   if(argptr(0, (void*)&function, sizeof(void*)) == -1 ||
-    argptr(0, (void*)&arg1, sizeof(void*)) == -1 ||
-    argptr(0, (void*)&arg2, sizeof(void*)) == -1 ||
-    argptr(0, (void*)&stack, sizeof(void*)) == -1)
-    return -1;
+    argptr(1, (void*)&arg1, sizeof(void*)) == -1 ||
+    argptr(2, (void*)&arg2, sizeof(void*)) == -1 ||
+    argptr(3, (void*)&stack, sizeof(void*)) == -1) {
+      cprintf("bad args\n");
+      return -1;
+    }
+
 
     // check if stack is page aligned
+
   if((uint) stack % PGSIZE != 0) {
+    cprintf("page alignment\n");
     return -1;
   }
 
+
   // check stack size == PGSIZE
-  if((uint)proc->sz - (uint)stack != PGSIZE) {
+
+  if(proc->sz - (uint)stack < PGSIZE) {
+    cprintf("size\n");
     return -1;
   }
+
 
   return clone(function, arg1, arg2, stack);
 }
@@ -40,7 +49,7 @@ sys_join(void) {
   if(argptr(0, (void*)&stack, sizeof(void*)) == -1) {
     return -1;
   }
-  
+
   return join(stack);
 }
 int

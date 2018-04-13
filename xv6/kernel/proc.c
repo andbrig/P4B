@@ -119,14 +119,16 @@ growproc(int n)
 
   // not only do we need to update the proc's size, but also the
   // child threads' sizes, as they share the same address space
+  /*
   acquire(&ptable.lock);
+  struct proc* p;
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
     if(p->parent == proc && p->pgdir == proc->pgdir) {  // check if a child thread
       p->sz = sz;
     }
   }
   release(&ptable.lock);
-
+*/
   proc->sz = sz;
   switchuvm(proc);
   return 0;
@@ -172,11 +174,16 @@ fork(void)
 int
 clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
   // same as fork
-  int i, pid;
+  int i;
+  //int pid;
   struct proc *np;
 
-  if((np == allocproc()) == 0)
+
+  if((np = allocproc()) == 0) {
+    cprintf("fuck\n");
     return -1;
+  }
+
 
   // threads share same address space; no need to create new page directory entry
   np->pgdir = proc->pgdir;
@@ -203,13 +210,14 @@ clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
    *                    [empty slot]          [-------- new frame/base pointer
    *                                                (also the new stack pointer)
    *
-   *
+   *  0
    *
    */
 
   // setup function arguments on stack
   void* stackBase = stack + PGSIZE;
   stackBase -= sizeof(void*);
+
   *((uint*) stackBase) = (uint) arg2;
   stackBase -= sizeof(void*);
   *((uint*) stackBase) = (uint) arg1;
@@ -219,9 +227,10 @@ clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
   *((uint*) stackBase) = 0xffffffff;
 
   // set new base pointer and stack pointer to be same value
-  stackBase -= sizeof(void*);
-  np->tf->ebp = stackBase;
-  np->tf->esp = stackBase;
+
+  np->tf->ebp = (uint) stackBase;
+  //stackBase -= sizeof(void*);
+  np->tf->esp = (uint) stackBase;
 
   // set instruction pointer to start of function call
   np->tf->eip = (uint) fcn;
@@ -233,10 +242,12 @@ clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
   np->cwd = idup(proc->cwd);
 
   // in main thread, return child proc's pid
-  pid = np->pid;
+  //pid = np->pid;
+  //np->pid = pid;
   np->state = RUNNABLE;
   safestrcpy(np->name, proc->name, sizeof(proc->name));
-  return pid;
+//  cprintf("NP->PID:");
+  return np->pid;
 }
 
 
@@ -317,7 +328,7 @@ wait(void)
         continue;
       }
       havekids = 1;
-      if(p->state == ZOMBIE){
+      if(p->state == ZOMBIE) {
         // Found one.
         pid = p->pid;
         kfree(p->kstack);
