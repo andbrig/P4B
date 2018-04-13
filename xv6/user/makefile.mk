@@ -5,6 +5,7 @@ USER_PROGS := \
 	threads_basic\
 	threads_many\
 	threads_sbrk\
+	threads_zombies\
 	cat\
 	echo\
 	grep\

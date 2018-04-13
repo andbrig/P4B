@@ -13,6 +13,8 @@ struct {
 
 static struct proc *initproc;
 
+struct spinlock sbrk_lock;
+
 int nextpid = 1;
 extern void forkret(void);
 extern void trapret(void);
@@ -23,6 +25,7 @@ void
 pinit(void)
 {
   initlock(&ptable.lock, "ptable");
+  initlock(&sbrk_lock, "sbrk");
 }
 
 // Look in the process table for an UNUSED proc.
@@ -69,6 +72,8 @@ found:
   p->context->eip = (uint)forkret;
 
   p->ref_count = 1;
+	// possibly remove this lock line (simply testing)
+	/** lock_init(&p->t_lock); */
 
   return p;
 }
@@ -110,6 +115,7 @@ growproc(int n)
 {
   uint sz;
 
+	/** lock_acquire(&proc->t_lock); */
   sz = proc->sz;
   if(n > 0){
     if((sz = allocuvm(proc->pgdir, sz, sz + n)) == 0)
@@ -118,20 +124,24 @@ growproc(int n)
     if((sz = deallocuvm(proc->pgdir, sz, sz + n)) == 0)
       return -1;
   }
+	/** lock_release(&proc->t_lock); */
 
   // not only do we need to update the proc's size, but also the
   // child threads' sizes, as they share the same address space
 
+  proc->sz = sz;
   acquire(&ptable.lock);
   struct proc* p;
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-    if(p->parent == proc && p->pgdir == proc->pgdir) {  // check if a child thread
+    if(p->pgdir == proc->pgdir) {  // check if a child thread
       p->sz = sz;
+      //p->parent->sz = sz;
     }
   }
+
+
   release(&ptable.lock);
 
-  proc->sz = sz;
   switchuvm(proc);
   return 0;
 }
@@ -182,7 +192,7 @@ clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
 
 
   if((np = allocproc()) == 0) {
-    cprintf("fuck\n");
+  //  cprintf("fuck\n");
     return -1;
   }
 
@@ -192,6 +202,7 @@ clone(void(*fcn)(void*, void*), void* arg1, void* arg2, void* stack) {
 
   // same as fork
   np->sz = proc->sz;
+	//cprintf("thread/parent proc size: %d\n", np->sz);
   np->parent = proc;
   *np->tf = *proc->tf;
 
@@ -330,6 +341,7 @@ wait(void)
       if(p->parent != proc || proc->pgdir == p->pgdir)  // skip through threads
         continue;
       havekids = 1;
+      //cprintf("ref-count: %d\n", p->ref_count);
       if(p->state == ZOMBIE && p->ref_count == 1) { // check if no threads associated
         // Found one.
         pid = p->pid;
@@ -372,10 +384,14 @@ join(void** stack) {
     havekids = 0;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       // check if child is thread
-      if(p->parent != proc || proc->pgdir != p->pgdir)  // skip full procs
+      if(p->parent != proc || proc->pgdir != p->pgdir) {
+      //  cprintf("Nikhil\n");
         continue;
+      }  // skip full procs
       havekids = 1;
+    //  cprintf("join shud work...\n");
       if(p->state == ZOMBIE){
+      //  cprintf("wtf\n");
         // Found one.
         pid = p->pid;
 
@@ -384,8 +400,11 @@ join(void** stack) {
         //  freevm(p->pgdir); // dont free vm; threads share the same pgdir!
         // however, we must copy the location of the child's user stack so that
         // it can be free'd outside of join
+      //  cprintf("john doe\n");
         *stack = p->ustack;
+      //  cprintf("MESSED UP IN JOIN\n");
         *((uint*)(*stack)) = (uint) p->mem_start;
+      //  cprintf("NOT REALLY\n");
       //  cprintf("Join mem_start: %d\n", *((uint*)*stack));
         kfree(p->kstack);
         p->kstack = 0;
@@ -401,9 +420,11 @@ join(void** stack) {
         return pid;
       }
     }
+  //  cprintf("Join did not work...\n");
 
     // No point waiting if we don't have any children.
     if(!havekids || proc->killed){
+  //    cprintf("we are in here... i dont think this is right...\n");
       release(&ptable.lock);
       return -1;
     }
