@@ -109,9 +109,12 @@ memmove(void *vdst, void *vsrc, int n)
 int
 thread_create(void (*start_routine)(void*, void*), void* arg1, void* arg2) {
 //printf(1, "before malloc\n");
-  void* mem_start = malloc(PGSZ);
-  if(mem_start == NULL)
-    return -1;
+  void* mem_start = malloc(2*PGSZ);
+  if(mem_start == NULL) {
+    //  printf(1, "catastrophic error\n");
+        return -1;
+  }
+
   //printf(1, "after malloc\n");
   void* ustack = mem_start;
   uint start_mod = (uint) mem_start % PGSZ;
@@ -121,7 +124,7 @@ thread_create(void (*start_routine)(void*, void*), void* arg1, void* arg2) {
     ustack = (void*)ustack + (uint)(PGSZ - start_mod);
     //ustack += (start_mod);
   }
-//  printf(1, "mem_start: %p, ustack: %p\n\n", mem_start, ustack);
+  //printf(1, "mem_start: %p, ustack: %p\n\n", mem_start, ustack);
   *((uint*)ustack) = (uint) mem_start;
   //printf(1, "mem_start addr (in create): %p\n", mem_start);
   //printf(1, "mem_start: %p, ustack: %p\n", mem_start, ustack);
@@ -133,10 +136,15 @@ int
 thread_join() {
   void* ustack = NULL;
   int join_ret = join(&ustack);
+//  printf(1, "return value of join is... %d\n", join_ret);
 //  if(join_ret != -1) {
   //  void* free_ptr = (void*)*((uint*)(ustack + PGSZ - sizeof(void*)));
-  //printf(1, "mem_start addr (in join): %p\n", ustack);
+  if(join_ret == -1) {
+  //  printf(1, "join -1\n");
+    return -1;
+  }
   uint* free_ptr = (uint*)ustack;
+  //  printf(1, "mem_start addr (in join): %p\n", (void*)*free_ptr);
     free((void*)*free_ptr);
 //  }
   //free(ustack);

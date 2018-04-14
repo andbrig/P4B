@@ -73,19 +73,26 @@ malloc(uint nbytes)
   }
   for(p = prevp->s.ptr; ; prevp = p, p = p->s.ptr){
     if(p->s.size >= nunits){
-      if(p->s.size == nunits)
+      //uint debug_sz = p->s.size;
+      if(p->s.size == nunits) {
+        //printf(1,"exact size..\n");
         prevp->s.ptr = p->s.ptr;
+      }
       else {
+      //  printf(1,"coalescing done\n");
         p->s.size -= nunits;
         p += p->s.size;
         p->s.size = nunits;
       }
       freep = prevp;
-      //printf(1, "Alloc'd actually %d bytes\n", nbytes);
+    //  printf(1, "actually need %d units, gave %d units\n", nunits,debug_sz);
       return (void*)(p + 1);
     }
     if(p == freep)
-      if((p = morecore(nunits)) == 0)
+      if((p = morecore(nunits)) == 0) {
+      //  printf(1, "malloc returns 0\n");
         return 0;
+      }
+
   }
 }
