@@ -32,27 +32,27 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
+kill
+stressfs
+clone_arguments
 balloc: first 594 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
@@ -96,27 +96,27 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
+kill
+stressfs
+clone_arguments
 balloc: first 594 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
@@ -129,7 +129,6 @@ WARNING: Image format was not specified for 'fs.img' and probing guessed raw.
 WARNING: Image format was not specified for 'xv6.img' and probing guessed raw.
          Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
          Specify the 'raw' format explicitly to remove the restrictions.
-main-loop: WARNING: I/O thread spun for 1000 iterations
 xv6...
 lapicinit: 1 0xfee00000
 cpu1: starting
@@ -161,27 +160,27 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
+kill
+stressfs
+clone_arguments
 balloc: first 595 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
@@ -225,28 +224,28 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
-balloc: first 597 blocks have been allocated
+kill
+stressfs
+clone_arguments
+balloc: first 596 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
 make qemu-nox 
@@ -289,27 +288,27 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
+kill
+stressfs
+clone_arguments
 balloc: first 597 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
@@ -329,10 +328,6 @@ cpu0: starting
 init: starting sh
 $ tester
 tester
-bad args
-bad args
-page alignment or size error
-page alignment or size error
 PASSED TEST!
 
 
@@ -357,27 +352,27 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
+kill
+stressfs
+clone_arguments
 balloc: first 595 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
@@ -406,6 +401,134 @@ PASSED TEST!
 test clone_return PASSED (10 of 10)
  (test for clone() where the thread function returns, requires manual inspection)
 
+starting clone_wait
+
+**********************************************************************
+
+Test clone_wait
+after clone(), wait() should not succeed
+
+**********************************************************************
+Running xv6 user progam /u/c/s/cs537-1/ta/tests/4b-new/ctests/clone_wait.c
+Trying to build project using make
+make
+gcc  -I include -nostdinc -Wall -Werror -ggdb -fno-pic -fno-builtin -fno-strict-aliasing -fno-stack-protector -m32 \
+	-M -MG user/tester.c -MF user/tester.d -MT user/tester.d -MT user/tester.o
+gcc  -I include -nostdinc -Wall -Werror -ggdb -fno-pic -fno-builtin -fno-strict-aliasing -fno-stack-protector -m32 -c -o user/tester.o user/tester.c
+ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --output=user/bin/tester user/tester.o user/ulib.o user/usys.o user/printf.o user/umalloc.o
+cp user/bin/tester fs/tester
+./tools/mkfs fs.img fs
+used 29 (bit 1 ninode 26) free 29 total 1024
+mkdir
+zombie
+usertests
+init
+threads_zombies
+README
+tester
+echo
+sh
+grep
+ls
+wc
+threads_sbrk
+ln
+rm
+threads_basic
+threads_many
+cat
+kill
+stressfs
+clone_arguments
+balloc: first 595 blocks have been allocated
+balloc: write bitmap block at sector 28
+rm user/bin/tester
+make qemu-nox 
+Ctrl+a h for help
+/u/c/s/cs537-1/ta/tools/qemu -nographic -hdb fs.img xv6.img -smp 2
+WARNING: Image format was not specified for 'fs.img' and probing guessed raw.
+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+         Specify the 'raw' format explicitly to remove the restrictions.
+WARNING: Image format was not specified for 'xv6.img' and probing guessed raw.
+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+         Specify the 'raw' format explicitly to remove the restrictions.
+xv6...
+lapicinit: 1 0xfee00000
+cpu1: starting
+cpu0: starting
+init: starting sh
+$ tester
+tester
+PASSED TEST!
+
+
+test clone_wait PASSED (10 of 10)
+ (after clone(), wait() should not succeed)
+
+starting fork_join
+
+**********************************************************************
+
+Test fork_join
+after fork(), join() should not succeed
+
+**********************************************************************
+Running xv6 user progam /u/c/s/cs537-1/ta/tests/4b-new/ctests/fork_join.c
+Trying to build project using make
+make
+gcc  -I include -nostdinc -Wall -Werror -ggdb -fno-pic -fno-builtin -fno-strict-aliasing -fno-stack-protector -m32 \
+	-M -MG user/tester.c -MF user/tester.d -MT user/tester.d -MT user/tester.o
+gcc  -I include -nostdinc -Wall -Werror -ggdb -fno-pic -fno-builtin -fno-strict-aliasing -fno-stack-protector -m32 -c -o user/tester.o user/tester.c
+ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --output=user/bin/tester user/tester.o user/ulib.o user/usys.o user/printf.o user/umalloc.o
+cp user/bin/tester fs/tester
+./tools/mkfs fs.img fs
+used 29 (bit 1 ninode 26) free 29 total 1024
+mkdir
+zombie
+usertests
+init
+threads_zombies
+README
+tester
+echo
+sh
+grep
+ls
+wc
+threads_sbrk
+ln
+rm
+threads_basic
+threads_many
+cat
+kill
+stressfs
+clone_arguments
+balloc: first 592 blocks have been allocated
+balloc: write bitmap block at sector 28
+rm user/bin/tester
+make qemu-nox 
+Ctrl+a h for help
+/u/c/s/cs537-1/ta/tools/qemu -nographic -hdb fs.img xv6.img -smp 2
+WARNING: Image format was not specified for 'fs.img' and probing guessed raw.
+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+         Specify the 'raw' format explicitly to remove the restrictions.
+WARNING: Image format was not specified for 'xv6.img' and probing guessed raw.
+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+         Specify the 'raw' format explicitly to remove the restrictions.
+xv6...
+lapicinit: 1 0xfee00000
+cpu1: starting
+cpu0: starting
+init: starting sh
+$ tester
+tester
+PASSED TEST!
+
+
+test fork_join PASSED (10 of 10)
+ (after fork(), join() should not succeed)
+
 starting threads_basic
 
 **********************************************************************
@@ -424,27 +547,27 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
+kill
+stressfs
+clone_arguments
 balloc: first 596 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
@@ -488,27 +611,27 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
+kill
+stressfs
+clone_arguments
 balloc: first 600 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
@@ -529,9 +652,9 @@ init: starting sh
 $ tester
 tester
 Creating child threads...
-Created 61 child threads
-Joining all 61 child threads...
-All 61 child threads joined
+Created 57 child threads
+Joining all 57 child threads...
+All 57 child threads joined
 Creating child threads...
 Created 61 child threads
 Joining all 61 child threads...
@@ -562,27 +685,27 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
+kill
+stressfs
+clone_arguments
 balloc: first 594 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
@@ -627,27 +750,27 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
+kill
+stressfs
+clone_arguments
 balloc: first 603 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
@@ -693,27 +816,27 @@ ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --o
 cp user/bin/tester fs/tester
 ./tools/mkfs fs.img fs
 used 29 (bit 1 ninode 26) free 29 total 1024
-clone_arguments
-echo
-threads_basic
 mkdir
-threads_many
+zombie
 usertests
+init
 threads_zombies
 README
-kill
-sh
-ls
 tester
-init
-wc
+echo
+sh
 grep
-ln
-stressfs
+ls
+wc
 threads_sbrk
-zombie
+ln
 rm
+threads_basic
+threads_many
 cat
+kill
+stressfs
+clone_arguments
 balloc: first 595 blocks have been allocated
 balloc: write bitmap block at sector 28
 rm user/bin/tester
@@ -740,6 +863,72 @@ PASSED TEST!
 test lock_basic PASSED (10 of 10)
  (basic test for lock correctness)
 
+starting lock_setup
+
+**********************************************************************
+
+Test lock_setup
+test that locks are set up correctly and do not interfere with each other
+
+**********************************************************************
+Running xv6 user progam /u/c/s/cs537-1/ta/tests/4b-new/ctests/lock_setup.c
+Trying to build project using make
+make
+gcc  -I include -nostdinc -Wall -Werror -ggdb -fno-pic -fno-builtin -fno-strict-aliasing -fno-stack-protector -m32 \
+	-M -MG user/tester.c -MF user/tester.d -MT user/tester.d -MT user/tester.o
+gcc  -I include -nostdinc -Wall -Werror -ggdb -fno-pic -fno-builtin -fno-strict-aliasing -fno-stack-protector -m32 -c -o user/tester.o user/tester.c
+ld  -m    elf_i386 -nostdlib --omagic --entry=main --section-start=.text=0x0 --output=user/bin/tester user/tester.o user/ulib.o user/usys.o user/printf.o user/umalloc.o
+cp user/bin/tester fs/tester
+./tools/mkfs fs.img fs
+used 29 (bit 1 ninode 26) free 29 total 1024
+mkdir
+zombie
+usertests
+init
+threads_zombies
+README
+tester
+echo
+sh
+grep
+ls
+wc
+threads_sbrk
+ln
+rm
+threads_basic
+threads_many
+cat
+kill
+stressfs
+clone_arguments
+balloc: first 596 blocks have been allocated
+balloc: write bitmap block at sector 28
+rm user/bin/tester
+make qemu-nox 
+Ctrl+a h for help
+/u/c/s/cs537-1/ta/tools/qemu -nographic -hdb fs.img xv6.img -smp 2
+WARNING: Image format was not specified for 'fs.img' and probing guessed raw.
+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+         Specify the 'raw' format explicitly to remove the restrictions.
+WARNING: Image format was not specified for 'xv6.img' and probing guessed raw.
+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+         Specify the 'raw' format explicitly to remove the restrictions.
+xv6...
+lapicinit: 1 0xfee00000
+cpu1: starting
+cpu0: starting
+init: starting sh
+$ tester
+tester
+Unblocking all 50 threads...
+Acquiring and releasing multiple locks...
+PASSED TEST!
+
+
+test lock_setup PASSED (10 of 10)
+ (test that locks are set up correctly and do not interfere with each other)
+
 **********************************************************************
 Summary:
 test build PASSED
@@ -763,6 +952,12 @@ test clone_bad PASSED (10 of 10)
 test clone_return PASSED (10 of 10)
  (test for clone() where the thread function returns, requires manual inspection)
 
+test clone_wait PASSED (10 of 10)
+ (after clone(), wait() should not succeed)
+
+test fork_join PASSED (10 of 10)
+ (after fork(), join() should not succeed)
+
 test threads_basic PASSED (10 of 10)
  (basic tests for thread_create() and thread_join())
 
@@ -778,6 +973,9 @@ test threads_sbrk PASSED (10 of 10)
 test lock_basic PASSED (10 of 10)
  (basic test for lock correctness)
 
-Passed 12 of 12 tests.
-Overall 12 of 12
-Points 110 of 110
+test lock_setup PASSED (10 of 10)
+ (test that locks are set up correctly and do not interfere with each other)
+
+Passed 15 of 15 tests.
+Overall 15 of 15
+Points 140 of 140

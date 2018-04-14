@@ -18,13 +18,13 @@ sys_clone(void) {
     argptr(1, (void*)&arg1, sizeof(void*)) == -1 ||
     argptr(2, (void*)&arg2, sizeof(void*)) == -1 ||
     argptr(3, (void*)&stack, sizeof(void*)) == -1) {
-      cprintf("bad args\n");
+    //  cprintf("bad args\n");
       return -1;
   }
 
   // check page alignment and stack size
   if((uint) stack % PGSIZE != 0 || proc->sz - (uint)stack < PGSIZE) {
-    cprintf("page alignment or size error\n");
+    //cprintf("page alignment or size error\n");
     return -1;
   }
 
@@ -86,8 +86,10 @@ sys_sbrk(void)
     return -1;
   acquire(&sbrk_lock);
   addr = proc->sz;
-  if(growproc(n) < 0)
+  if(growproc(n) < 0) {
+    release(&sbrk_lock);
     return -1;
+  }
   release(&sbrk_lock);
   return addr;
 }

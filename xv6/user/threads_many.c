@@ -81,9 +81,13 @@ fill_ptable(void)
   check(i < MAX_THREADS, "Should not have created max threads");
 
   printf(1, "Joining all %d child threads...\n");
+//  printf(1, "wtf\n");
   for (i = 0; i < num_threads; ++i) {
+    //printf(1, "itr: %d\n", i);
     pid = thread_join();
+  //  printf(1, "join passed\n");
     status = kill(pid);
+  //  printf(1, "kill passed\n");
     check(status == -1, "Child was still alive after thread_join()");
     check(ppid < pid && pid <= lastpid, "thread_join() returned the wrong pid");
   }
